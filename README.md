@@ -146,7 +146,7 @@ Deben verificarse manualmente en Chrome/Firefox/Safari:
 - Analítica remota.
 
 ## Mejoras futuras
-
+Checkpoint: versión estable antes de autenticación
 - PWA offline una vez disponible el logotipo aprobado para crear iconos.
 - Pruebas automatizadas end-to-end con Playwright.
 - Modo de alto contraste adicional.
