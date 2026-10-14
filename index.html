@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#117C79">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Enfokia">
+  <meta name="description" content="Enfokia: herramientas locales de organización y autoconocimiento cotidiano.">
+  <title>Enfokia — Tu atención, a tu manera</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <button class="icon-button" id="backButton" type="button" aria-label="Volver" hidden>←</button>
+      <a class="brand" href="#/inicio" aria-label="Enfokia, ir a Inicio">
+        <img id="brandLogo" src="./assets/logo-enfokia.png" alt="Enfokia" hidden>
+        <span id="brandFallback" class="brand-word">ENFOKIA</span>
+      </a>
+      <button class="icon-button" id="helpButton" type="button" aria-label="Ayuda profesional">?</button>
+    </header>
+
+    <div id="storageNotice" class="notice notice-warning" role="status" hidden>
+      No se pudo acceder al almacenamiento local. Puedes usar la app, pero los cambios podrían perderse al cerrar esta pestaña.
+    </div>
+
+    <main id="main" tabindex="-1">
+      <section class="view" data-route="bienvenida">
+        <div class="hero">
+          <div class="eyebrow">Productividad personal</div>
+          <h1>Tu atención, a tu manera.</h1>
+          <p class="lead">Enfokia te ayuda a reconocer dificultades cotidianas, elegir un objetivo y convertir pendientes en acciones realizables.</p>
+          <div class="hero-card">
+            <h2>Antes de empezar</h2>
+            <p>Enfokia ofrece herramientas de organización y autoconocimiento cotidiano. <strong>No permite saber si tienes TDAH</strong>, no mide gravedad clínica y no sustituye una evaluación profesional.</p>
+            <p class="muted">Tus datos se guardan solamente en este navegador. No se envían a un servidor y no se sincronizan entre dispositivos.</p>
+          </div>
+          <div class="stack">
+            <button class="button primary" id="startAssessmentButton" data-go="preferencias">Comenzar</button>
+            <button class="button secondary" id="skipAssessmentButton">Omitir evaluación y elegir objetivo</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" data-route="preferencias" hidden>
+        <header class="section-header">
+          <div class="eyebrow">Configuración inicial</div>
+          <h1>Primero, adapta Enfokia a ti</h1>
+          <p>Esto define tu primera experiencia. Puedes cambiarlo después.</p>
+        </header>
+
+        <form id="preferencesForm" class="card form-card" novalidate>
+          <fieldset>
+            <legend>Confirmación de edad</legend>
+            <label class="check-row">
+              <input id="adultCheck" type="checkbox" required>
+              <span>Tengo 18 años o más.</span>
+            </label>
+            <p class="field-error" data-error-for="adultCheck"></p>
+          </fieldset>
+
+          <label class="field">
+            <span>Objetivo inicial</span>
+            <select id="goalSelect" required>
+              <option value="">Selecciona un objetivo</option>
+              <option>Empezar tareas</option>
+              <option>Mantener el foco</option>
+              <option>Organizar pendientes</option>
+              <option>Gestionar el tiempo</option>
+              <option>Terminar tareas</option>
+              <option>Recordar compromisos</option>
+            </select>
+            <small>Tu elección manual tiene prioridad sobre los resultados del mapa.</small>
+            <span class="field-error" data-error-for="goalSelect"></span>
+          </label>
+
+          <fieldset>
+            <legend>Duración preferida</legend>
+            <div class="segmented" role="radiogroup" aria-label="Duración preferida">
+              <label><input type="radio" name="preferredDuration" value="5"><span>5 min</span></label>
+              <label><input type="radio" name="preferredDuration" value="10" checked><span>10 min</span></label>
+              <label><input type="radio" name="preferredDuration" value="15"><span>15 min</span></label>
+              <label><input type="radio" name="preferredDuration" value="25"><span>25 min</span></label>
+            </div>
+          </fieldset>
+
+          <button class="button primary" type="submit">Guardar y continuar</button>
+        </form>
+      </section>
+
+      <section class="view" data-route="mapa" hidden>
+        <header class="section-header">
+          <div class="eyebrow">Mi mapa · últimas dos semanas</div>
+          <h1>Reconoce lo que te está costando</h1>
+          <p>Este cuestionario es descriptivo y original. No es una escala clínica ni diagnostica TDAH.</p>
+        </header>
+
+        <div class="progress-wrap" aria-label="Progreso del cuestionario">
+          <div class="progress-meta"><span id="assessmentProgressText">Pregunta 1 de 18</span><span id="assessmentProgressPercent">6%</span></div>
+          <div class="progress-bar"><span id="assessmentProgressBar"></span></div>
+        </div>
+
+        <form id="assessmentForm" class="card assessment-card">
+          <div id="assessmentQuestion"></div>
+          <div class="assessment-actions">
+            <button class="button secondary" id="assessmentPrev" type="button">Anterior</button>
+            <button class="button primary" id="assessmentNext" type="button">Siguiente</button>
+          </div>
+        </form>
+
+        <div id="assessmentExtras" class="card form-card" hidden>
+          <h2>Para personalizar tu plan</h2>
+
+          <label class="field">
+            <span>Impacto en tu vida cotidiana</span>
+            <select id="impactSelect">
+              <option value="">Selecciona</option>
+              <option>Nada</option><option>Poco</option><option>Algo</option>
+              <option>Bastante</option><option>Muchísimo</option><option>Prefiero no responder</option>
+            </select>
+          </label>
+
+          <fieldset>
+            <legend>¿En qué contextos lo notas?</legend>
+            <div class="check-grid" id="contextsGroup">
+              <label><input type="checkbox" value="Trabajo"> Trabajo</label>
+              <label><input type="checkbox" value="Estudios"> Estudios</label>
+              <label><input type="checkbox" value="Hogar"> Hogar</label>
+              <label><input type="checkbox" value="Proyectos personales"> Proyectos personales</label>
+              <label><input type="checkbox" value="Otro"> Otro</label>
+              <label><input type="checkbox" value="Prefiero no responder"> Prefiero no responder</label>
+            </div>
+          </fieldset>
+
+          <label class="field">
+            <span>Prioridad que quieres trabajar</span>
+            <select id="prioritySelect">
+              <option value="">Mantener la que elegí antes</option>
+              <option>Empezar tareas</option><option>Mantener el foco</option><option>Organizar pendientes</option>
+              <option>Gestionar el tiempo</option><option>Terminar tareas</option><option>Recordar compromisos</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>¿Quieres conocer orientación profesional?</span>
+            <select id="orientationSelect">
+              <option value="Ahora no">Ahora no</option>
+              <option value="Sí">Sí</option>
+            </select>
+          </label>
+
+          <button class="button primary" id="finishAssessmentButton" type="button">Ver mis resultados</button>
+        </div>
+      </section>
+
+      <section class="view" data-route="resultados" hidden>
+        <header class="section-header">
+          <div class="eyebrow">Mi mapa</div>
+          <h1>Resultados descriptivos</h1>
+          <p>Las puntuaciones de 0 a 4 representan <strong>frecuencia declarada</strong>, no gravedad clínica ni probabilidad de una condición.</p>
+        </header>
+
+        <div id="highImpactNotice" class="notice notice-info" hidden>
+          Como indicaste un impacto alto, puede ser útil considerar orientación profesional cualificada. Esta app no realiza evaluaciones clínicas.
+        </div>
+
+        <div id="resultsGrid" class="metrics-grid"></div>
+
+        <details class="card details-card">
+          <summary>Revisar mis respuestas</summary>
+          <div id="answersReview"></div>
+        </details>
+
+        <div class="card">
+          <h2>Objetivo prioritario</h2>
+          <p id="priorityExplanation"></p>
+          <div id="tiesNotice" class="muted"></div>
+          <div class="stack-inline">
+            <button class="button secondary" data-go="mapa">Editar respuestas</button>
+            <button class="button primary" data-go="plan">Crear mi plan</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" data-route="plan" hidden>
+        <header class="section-header">
+          <div class="eyebrow">Mi plan</div>
+          <h1>Un objetivo, dos herramientas</h1>
+          <p>Son estrategias organizativas para probar, no tratamientos médicos.</p>
+        </header>
+
+        <div class="card">
+          <label class="field">
+            <span>Objetivo actual</span>
+            <select id="planGoalSelect">
+              <option>Empezar tareas</option><option>Mantener el foco</option><option>Organizar pendientes</option>
+              <option>Gestionar el tiempo</option><option>Terminar tareas</option><option>Recordar compromisos</option>
+            </select>
+          </label>
+          <div id="recommendationsList" class="recommendation-list"></div>
+          <button id="savePlanButton" class="button primary" type="button">Guardar mi plan</button>
+        </div>
+      </section>
+
+      <section class="view" data-route="inicio" hidden>
+        <header class="dashboard-header">
+          <div>
+            <div class="eyebrow">Hoy</div>
+            <h1>¿Cuál es tu siguiente paso?</h1>
+          </div>
+          <a class="text-link" href="#/ajustes">Ajustes</a>
+        </header>
+
+        <div id="nextActionCard" class="feature-card"></div>
+
+        <div class="quick-grid">
+          <a class="quick-card" href="#/primer-paso"><span class="quick-icon">1</span><strong>Primer paso</strong><small>Convierte una tarea en una acción breve.</small></a>
+          <a class="quick-card" href="#/foco"><span class="quick-icon">◷</span><strong>Modo foco</strong><small>Trabaja con un tiempo definido.</small></a>
+          <a class="quick-card" href="#/pendientes"><span class="quick-icon">✓</span><strong>Pendientes</strong><small>Ordena lo que sigue.</small></a>
+          <a class="quick-card" href="#/progreso"><span class="quick-icon">↗</span><strong>Progreso</strong><small>Revisa actividad real, sin rachas.</small></a>
+        </div>
+
+        <div class="card" id="dailyReviewCard" hidden>
+          <h2>Revisión diaria</h2>
+          <p>Tu objetivo actual es recordar compromisos. Revisa tus pendientes con fecha para elegir qué necesita atención hoy.</p>
+          <a class="button secondary" href="#/pendientes">Revisar pendientes</a>
+        </div>
+      </section>
+
+      <section class="view" data-route="primer-paso" hidden>
+        <header class="section-header">
+          <div class="eyebrow">Primer paso</div>
+          <h1>Haz que empezar sea más pequeño</h1>
+          <p>Define una acción que puedas reconocer como terminada.</p>
+        </header>
+
+        <form id="stepForm" class="card form-card" novalidate>
+          <label class="field"><span>Nombre de la tarea *</span><input id="stepTaskName" maxlength="120" minlength="3" required><span class="field-error"></span></label>
+          <label class="field"><span>Descripción</span><textarea id="stepDescription" maxlength="300"></textarea></label>
+          <label class="field"><span>Primer paso *</span><input id="stepAction" maxlength="180" minlength="3" required><small>Ejemplo: “Abrir el documento y escribir el título”.</small><span class="field-error"></span></label>
+          <label class="field"><span>Duración</span><select id="stepDuration"><option>2</option><option>5</option><option selected>10</option><option>15</option><option>25</option></select></label>
+          <label class="field"><span>Fecha objetivo (opcional)</span><input id="stepDueDate" type="date"></label>
+          <button class="button primary" type="submit">Crear primer paso</button>
+        </form>
+
+        <div id="activeStepCard" class="card" hidden></div>
+      </section>
+
+      <section class="view" data-route="pendientes" hidden>
+        <header class="dashboard-header">
+          <div><div class="eyebrow">Mis pendientes</div><h1>Organiza sin sobrecargar</h1></div>
+          <button id="newTaskButton" class="button compact primary" type="button">Nueva tarea</button>
+        </header>
+
+        <div class="toolbar card">
+          <label class="field compact-field"><span>Vista</span>
+            <select id="taskViewFilter"><option value="all">Todos</option><option value="today">Hoy</option><option value="upcoming">Próximos</option><option value="undated">Sin fecha</option></select>
+          </label>
+          <label class="field compact-field"><span>Estado</span>
+            <select id="taskStatusFilter"><option value="all">Todos</option><option value="pendiente">Pendiente</option><option value="en curso">En curso</option><option value="pausado">Pausado</option><option value="completado">Completado</option></select>
+          </label>
+          <label class="field compact-field"><span>Orden</span>
+            <select id="taskSort"><option value="priority">Prioridad</option><option value="date">Fecha</option><option value="recent">Recientes</option></select>
+          </label>
+        </div>
+
+        <div id="taskList"></div>
+      </section>
+
+      <section class="view" data-route="foco" hidden>
+        <header class="section-header">
+          <div class="eyebrow">Modo foco</div>
+          <h1>Un bloque de tiempo, una intención</h1>
+          <p>El temporizador nunca marcará una tarea como completada automáticamente.</p>
+        </header>
+
+        <div class="timer-card">
+          <div id="timerStateLabel" class="timer-state">Listo</div>
+          <div id="timerDisplay" class="timer-display" aria-live="polite">10:00</div>
+          <div class="timer-controls-grid" id="timerPresetGroup">
+            <button type="button" data-minutes="5">5 min</button><button type="button" data-minutes="10" class="active">10 min</button>
+            <button type="button" data-minutes="15">15 min</button><button type="button" data-minutes="25">25 min</button>
+          </div>
+          <label class="field"><span>Duración personalizada (1–60 min)</span><input id="customMinutes" type="number" min="1" max="60" inputmode="numeric"></label>
+          <label class="field"><span>Descanso opcional</span><select id="breakMinutes"><option value="0">Sin descanso</option><option value="3">3 min</option><option value="5">5 min</option><option value="10">10 min</option></select></label>
+          <div class="stack-inline">
+            <button id="timerStart" class="button primary" type="button">Iniciar</button>
+            <button id="timerPause" class="button secondary" type="button" disabled>Pausar</button>
+            <button id="timerCancel" class="button ghost" type="button" disabled>Cancelar</button>
+          </div>
+          <p id="timerCompletionMessage" class="notice notice-success" hidden></p>
+        </div>
+      </section>
+
+      <section class="view" data-route="progreso" hidden>
+        <header class="section-header">
+          <div class="eyebrow">Mi progreso</div>
+          <h1>Actividad real, sin juicios</h1>
+          <p>Estos indicadores se calculan únicamente con datos guardados en este navegador.</p>
+        </header>
+
+        <div class="segmented period-tabs" role="group" aria-label="Periodo">
+          <button type="button" data-period="7" class="active">7 días</button>
+          <button type="button" data-period="30">30 días</button>
+        </div>
+
+        <div id="progressMetrics" class="metrics-grid"></div>
+
+        <div class="card">
+          <h2>Utilidad percibida</h2>
+          <p>¿Cómo te resultó la herramienta que acabas de usar?</p>
+          <div class="segmented utility-group">
+            <button type="button" data-utility="Me ayudó">Me ayudó</button>
+            <button type="button" data-utility="No estoy seguro">No estoy seguro</button>
+            <button type="button" data-utility="No me ayudó">No me ayudó</button>
+          </div>
+          <p id="utilityStatus" class="muted"></p>
+        </div>
+
+        <form id="weeklyReviewForm" class="card form-card">
+          <h2>Revisión semanal opcional</h2>
+          <label class="field"><span>¿Qué herramienta te resultó más útil?</span><textarea id="reviewUseful" maxlength="300"></textarea></label>
+          <label class="field"><span>¿Qué dificultad encontraste?</span><textarea id="reviewDifficulty" maxlength="300"></textarea></label>
+          <label class="field"><span>¿Quieres mantener o cambiar tu objetivo?</span>
+            <select id="reviewGoal"><option value="">Sin cambios</option><option>Empezar tareas</option><option>Mantener el foco</option><option>Organizar pendientes</option><option>Gestionar el tiempo</option><option>Terminar tareas</option><option>Recordar compromisos</option></select>
+          </label>
+          <button class="button primary" type="submit">Guardar revisión</button>
+        </form>
+      </section>
+
+      <section class="view" data-route="ayuda" hidden>
+        <header class="section-header">
+          <div class="eyebrow">Ayuda profesional</div>
+          <h1>Qué puede y qué no puede hacer Enfokia</h1>
+        </header>
+        <div class="card prose">
+          <p><strong>Enfokia ofrece herramientas de organización y autoconocimiento cotidiano. No permite saber si tienes TDAH ni sustituye una evaluación clínica. Si las dificultades son persistentes, afectan significativamente tu vida o te generan preocupación, considera consultar a un profesional de salud cualificado.</strong></p>
+          <p>La aplicación no diagnostica, no prescribe tratamientos y no calcula probabilidades clínicas. Si necesitas apoyo urgente o estás en una situación de crisis, busca servicios profesionales o de emergencia disponibles en tu localidad.</p>
+        </div>
+        <div class="card">
+          <h2>Resumen voluntario</h2>
+          <p>Puedes generar un resumen con tus respuestas, objetivo y herramientas utilizadas para copiarlo o imprimirlo.</p>
+          <div class="stack-inline">
+            <button id="generateSummaryButton" class="button primary" type="button">Generar resumen</button>
+            <button id="printSummaryButton" class="button secondary" type="button">Imprimir</button>
+          </div>
+          <textarea id="professionalSummary" class="summary-box" aria-label="Resumen para orientación profesional" readonly></textarea>
+        </div>
+      </section>
+
+      <section class="view" data-route="ajustes" hidden>
+        <header class="section-header">
+          <div class="eyebrow">Mi espacio</div>
+          <h1>Ajustes y privacidad</h1>
+        </header>
+
+        <div class="card form-card">
+          <h2>Accesibilidad</h2>
+          <label class="check-row"><input id="largeTextToggle" type="checkbox"><span>Texto más grande</span></label>
+          <label class="check-row"><input id="reduceMotionToggle" type="checkbox"><span>Reducir movimiento</span></label>
+        </div>
+
+        <div class="card">
+          <h2>Mis datos</h2>
+          <p class="muted">Los datos se guardan mediante localStorage en este navegador. Pueden perderse si borras los datos del sitio y no se sincronizan entre dispositivos.</p>
+          <div class="stack-inline">
+            <button id="exportButton" class="button secondary" type="button">Exportar JSON</button>
+            <label class="button secondary file-button">Importar JSON<input id="importInput" type="file" accept="application/json" hidden></label>
+          </div>
+          <button id="deleteAllButton" class="button danger" type="button">Borrar todos mis datos</button>
+          <p id="dataActionStatus" role="status"></p>
+        </div>
+
+        <div class="card">
+          <h2>Privacidad</h2>
+          <p>No usamos analítica remota, seguimiento publicitario ni enviamos información personal a un servidor en este MVP.</p>
+          <a class="text-link" href="#/ayuda">Ver límites y orientación profesional</a>
+        </div>
+      </section>
+    </main>
+
+    <nav id="bottomNav" class="bottom-nav" aria-label="Navegación principal" hidden>
+      <a href="#/inicio" data-nav="inicio"><span aria-hidden="true">⌂</span><span>Inicio</span></a>
+      <a href="#/pendientes" data-nav="pendientes"><span aria-hidden="true">✓</span><span>Pendientes</span></a>
+      <a href="#/progreso" data-nav="progreso"><span aria-hidden="true">↗</span><span>Mi progreso</span></a>
+      <a href="#/ajustes" data-nav="ajustes"><span aria-hidden="true">◉</span><span>Mi espacio</span></a>
+    </nav>
+  </div>
+
+  <dialog id="taskDialog">
+    <form method="dialog" id="taskForm" class="dialog-card" novalidate>
+      <div class="dialog-head"><h2 id="taskDialogTitle">Nueva tarea</h2><button class="icon-button" value="cancel" aria-label="Cerrar">×</button></div>
+      <input id="taskId" type="hidden">
+      <label class="field"><span>Título *</span><input id="taskTitle" minlength="3" maxlength="120" required><span class="field-error"></span></label>
+      <label class="field"><span>Descripción</span><textarea id="taskDescription" maxlength="300"></textarea></label>
+      <label class="field"><span>Prioridad</span><select id="taskPriority"><option value="baja">Baja</option><option value="media" selected>Media</option><option value="alta">Alta</option></select></label>
+      <label class="field"><span>Fecha objetivo</span><input id="taskDueDate" type="date"></label>
+      <label class="field"><span>Estado</span><select id="taskStatus"><option>pendiente</option><option>en curso</option><option>pausado</option><option>completado</option></select></label>
+      <label class="field"><span>Primer paso</span><input id="taskFirstStep" maxlength="180"></label>
+      <div class="stack-inline">
+        <button class="button secondary" value="cancel" type="button" id="cancelTaskDialog">Cancelar</button>
+        <button class="button primary" type="submit">Guardar tarea</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="./js/app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
